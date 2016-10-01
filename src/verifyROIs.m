@@ -1,3 +1,4 @@
+%% Understand the definition of ROIs
 clear variables; clc; close all;
 
 % specify path information
@@ -7,19 +8,12 @@ DIR.OUT = fullfile(DIR.PROJECT, 'results/');
 
 % constants
 SUBJ_NAMES = {'ah','br','ds','jf','rl'};
-TR = 5; %use data at this TR to do classification
-% the stimulus classes are a circular domain: 0 is rightward motion, pi is
-% leftward motion, pi/2 is 'away' motion, 3*pi/2 is 'towards' motion
-Y_RANGE = [1 2 3 4 5 6 7 8];
-Y_LABELS = 0:pi/4:(2*pi - pi/4);
-
 % specify parameters
-numCVB = 8;
-options.nlambda = 100;
 nSubjs = length(SUBJ_NAMES);
 
-%%
+%% record ROI info
 fprintf('subjID\t subjName\t numVox_ROIs\t numVox_cortex\t numVox_ROIs_unique \t ROI/cortex \n')
+% loop over all subjects
 for s = 1 : nSubjs
     load(fullfile(DIR.DATA, SUBJ_NAMES{s}));
     % record the number of voxels in cortex and predefined ROIs 
