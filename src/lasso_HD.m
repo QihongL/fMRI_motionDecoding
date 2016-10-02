@@ -5,6 +5,8 @@
 %   3. all voxels outside of the ROIs (within the cortex)
 clear variables; clc; close all;
 seed = 1; rng(seed);    % for reproducibility 
+analysis_name = 'ROIs'; 
+
 
 % specify path information
 DIR.PROJECT = '/Users/Qihong/Dropbox/github/motionDecoding_fMRI/';
@@ -14,7 +16,7 @@ DIR.OUT = fullfile(DIR.PROJECT, 'results/');
 NCVB = 5; % 5-folds cross validation
 NCVB_internal = 4; 
 options.nlambda = 50;
-saveResults = 0; 
+saveResults = 1; 
 
 % CONSTANTS (should not be changed)
 SUBJ_NAMES = {'ah','br','ds','jf','rl'};
@@ -33,7 +35,7 @@ Y_LABELS = 0: pi/2 : (2*pi - pi/4);
 
 % specify parameters
 nSubjs = length(SUBJ_NAMES);
-FILENAMES = strcat(SUBJ_NAMES, {'_trunc.mat'});
+FILENAMES = strcat(SUBJ_NAMES, {strcat('_', analysis_name, '.mat')});
 
 
 %% decode 
@@ -58,6 +60,7 @@ for s = 1 : nSubjs
     % loop over TR ("time")
     for t = 1 : NTR
         fprintf('%d ', t);
+        
         % select horizontal-depth data 
         X = data.detrended{t}(HOR_DEP_MASK,:);
         
@@ -80,6 +83,6 @@ end
 
 %% save the result file to an output dir
 if saveResults
-    saveFileName = 'result_HD';
+    saveFileName = strcat('result_HD_',analysis_name);
     save(strcat(DIR.OUT,saveFileName, '.mat'), 'RESULTS')
 end

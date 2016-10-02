@@ -5,8 +5,7 @@
 %   3. all voxels outside of the ROIs (within the cortex)
 clear variables; clc; clf; 
 
-
-result_file_name = 'result_HD_wholebrain';
+result_file_name = 'result_HD_ROIs';
 chance = .5; 
 
 % specify path information
