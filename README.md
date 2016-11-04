@@ -7,8 +7,8 @@ In particular, I am using sparse MVPA methods to decode motion and depth percept
 Data collected by <a href = "http://psych.wisc.edu/vision/research.php">Rokers lab </a>  at UW-Madison. 
 
 
-
-### Dependencies
+<br><br>
+<h3>Dependencies</h3>
 * Matlab 
  * <a href = "http://web.stanford.edu/~hastie/glmnet_matlab/">Glmnet</a>
  * <a href = "https://www.mathworks.com/matlabcentral/fileexchange/41859-moving-average-function">movingmean</a>
