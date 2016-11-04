@@ -3,76 +3,63 @@
 %   1. all voxels in the cortex
 %   2. all voxels in the ROIs
 %   3. all voxels outside of the ROIs (within the cortex)
-clear variables; clc; clf; 
-
-result_file_name = 'result_HD_ROIs';
-chance = .5; 
-
+clear variables; clc;
+fh=findall(0,'type','figure');
+for i=1:length(fh)
+    clo(fh(i));
+end
 % specify path information
 DIR.PROJECT = '/Users/Qihong/Dropbox/github/motionDecoding_fMRI/';
 DIR.OUT = fullfile(DIR.PROJECT, 'results/');
-% parameters 
-NCVB = 5; % 5-folds cross validation
-NCVB_internal = 4; 
-
 % CONSTANTS (should not be changed)
 SUBJ_NAMES = {'ah','br','ds','jf','rl'};
 NTR = 16;
-NRUNS = 10;
-CVB_UNIT = NRUNS/NCVB;
-NBLOCK_TRAIN = CVB_UNIT * (NCVB-1);
 nSubjs = length(SUBJ_NAMES);
+chance = .5;
+% parameters
+NCVB = 5; % 5-folds cross validation
+NCVB_internal = 4;
 
-%% read result file 
-load(fullfile(DIR.OUT, strcat(result_file_name, '.mat')))
+%% select data
+sim_conditions = {'v1', 'ROIs', 'wb'};
+% sim_conditions = {'wb'};
 
-% gather accuracy
-accuracy.mean = nan(NTR,nSubjs);
-accuracy.sd = nan(NTR,nSubjs);
-for s = 1 : nSubjs
-    for t = 1 : NTR
-        % compute the mean and std for the accuracy
-        accuracy.mean(t,s) = mean(RESULTS{s}.accuracy(t,:));
-        accuracy.sd(t,s) = std(RESULTS{s}.accuracy(t,:),0); 
-    end
+
+%% read result file
+numConditions = length(sim_conditions);
+perf = cell(3,1);
+for i = 1 : numConditions
+    result_filename = strcat('result_HD_', sim_conditions{i});
+    load(fullfile(DIR.OUT, strcat(result_filename, '.mat')))
+    perf{i} = readResults(RESULTS, NTR, nSubjs);
+    perf{i}.conditionName = result_filename;
 end
 
 %% plot the accuracy
 p.FS = 14;
 p.LW = 2;
-alpha = .05; 
-analysis_name = strrep(result_file_name, '_', ' ');
+alpha = .05;
 
-% plot accuracy (averaged across all subjects) over TRs
+% plot mean accuracy (averaged across all subjects) over TRs
 figure(1)
-% SE over subjects
-se = tinv(1 - alpha/2, nSubjs-1) * std(accuracy.mean,0,2) / sqrt(NCVB);
-errorbar(1:NTR, mean(accuracy.mean,2),se, 'linewidth', p.LW);
+hold on
+for i = 1 : numConditions
+    analysis_name = strrep(perf{i}.conditionName, '_', ' ');
+    plotAccuracy_mean(perf{i}.accuracy, nSubjs, NCVB, NTR, alpha, p, 0)
+end
+hold off
 hline = refline(0,chance);
 hline.Color = 'k';
-title_text = sprintf('Mean Accuracy: %d subjects - %s', nSubjs, analysis_name);
+title_text = sprintf('Mean Accuracy: %d subjects', nSubjs);
 title(title_text, 'fontsize', p.FS)
-legend({'mean accuracy', 'chance'}, 'fontsize', p.FS, 'location', 'SE')
+legend(sim_conditions, 'fontsize', p.FS, 'location', 'best')
 ylabel('Mean CV accuracy', 'fontsize', p.FS)
 xlabel('TR', 'fontsize', p.FS)
 xlim([1 NTR])
 
-
-% plot accuracy (averaged across CVBs) over TRs, for each subject separately 
+% plot accuracy (averaged across CVBs) over TRs, for each subject separately
 figure(2)
-for s = 1 : nSubjs
-    subplot(2, ceil(nSubjs/2), s)
-    % SE over CV blocks
-    se = tinv(1 - alpha/2, nSubjs-1) * accuracy.sd(:,s) / sqrt(NCVB);
-    errorbar(1:NTR, accuracy.mean(:,s), se, 'linewidth', p.LW);
-    title_text = sprintf('Subject: %s ', SUBJ_NAMES{s});
-    title(title_text, 'fontsize', p.FS)
-    hline = refline(0,chance);
-    hline.Color = 'k';
-    ylabel('Mean CV accuracy', 'fontsize', p.FS)
-    xlabel('TR', 'fontsize', p.FS)
-    ylim([0 1])
-    xlim([1 NTR])
-end
-legend({'mean accuracy', 'chance'}, 'fontsize', p.FS, 'location', 'SE')
-suptitle(analysis_name)
+plotAccuracy_individual(perf, nSubjs, NCVB, NTR, ...
+    SUBJ_NAMES, sim_conditions, chance, alpha, p, 1)
+
+
