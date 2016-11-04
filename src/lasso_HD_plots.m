@@ -14,8 +14,6 @@ DIR.OUT = fullfile(DIR.PROJECT, 'results/');
 % parameters 
 NCVB = 5; % 5-folds cross validation
 NCVB_internal = 4; 
-options.nlambda = 50;
-saveResults = 0; 
 
 % CONSTANTS (should not be changed)
 SUBJ_NAMES = {'ah','br','ds','jf','rl'};
@@ -23,16 +21,6 @@ NTR = 16;
 NRUNS = 10;
 CVB_UNIT = NRUNS/NCVB;
 NBLOCK_TRAIN = CVB_UNIT * (NCVB-1);
-
-% the stimulus classes are a circular domain: 0 is rightward motion, pi is
-% leftward motion, pi/2 is 'away' motion, 3*pi/2 is 'towards' motion
-% Y_RANGE = [1 2 3 4 5 6 7 8];
-% Y_LABELS = 0: pi/4 : (2*pi - pi/4);
-HOR_DEP_MASK = repmat(logical([1 0 1 0 1 0 1 0])', [NRUNS,1]);
-Y_RANGE = [0 1 0 1];
-Y_LABELS = 0: pi/2 : (2*pi - pi/4);
-
-% specify parameters
 nSubjs = length(SUBJ_NAMES);
 
 %% read result file 
@@ -68,7 +56,6 @@ legend({'mean accuracy', 'chance'}, 'fontsize', p.FS, 'location', 'SE')
 ylabel('Mean CV accuracy', 'fontsize', p.FS)
 xlabel('TR', 'fontsize', p.FS)
 xlim([1 NTR])
-
 
 
 % plot accuracy (averaged across CVBs) over TRs, for each subject separately 

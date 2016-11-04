@@ -15,7 +15,9 @@ DIR.OUT = fullfile(DIR.PROJECT, 'results/');
 % parameters 
 NCVB = 5; % 5-folds cross validation
 NCVB_internal = 4; 
+TEST_TRIALS = 4; 
 options.nlambda = 50;
+options.alpha = 1; 
 saveResults = 1; 
 
 % CONSTANTS (should not be changed)
@@ -29,8 +31,9 @@ NBLOCK_TRAIN = CVB_UNIT * (NCVB-1);
 % leftward motion, pi/2 is 'away' motion, 3*pi/2 is 'towards' motion
 % Y_RANGE = [1 2 3 4 5 6 7 8];
 % Y_LABELS = 0: pi/4 : (2*pi - pi/4);
-HOR_DEP_MASK = repmat(logical([1 0 1 0 1 0 1 0])', [NRUNS,1]);
-Y_RANGE = [0 1 0 1];
+CLASS_MASK = logical([0 0 1 0 0 0 1 0]) 
+ROW_MASK = repmat(CLASS_MASK', [NRUNS,1]);
+Y_RANGE = [1 1 0 0 0 1];
 Y_LABELS = 0: pi/2 : (2*pi - pi/4);
 
 % specify parameters
@@ -59,19 +62,22 @@ for s = 1 : nSubjs
     RESULTS{s}.coef = nan(size(data.coords,1)+1,NCVB, NTR);
     % loop over TR ("time")
     for t = 1 : NTR
+%     for t = 5
         fprintf('%d ', t);
         
         % select horizontal-depth data 
-        X = data.detrended{t}(HOR_DEP_MASK,:);
+        X = data.detrended{t}(~ROW_MASK,:);
         
+        % TODO: for replication purpose, I should gen idx once and save them 
         idx_cvb = randperm(NCVB);
         % decode for all CVB
         for c = 1 : NCVB
             % set up the test index
             idx_testset = false(size(X,1),1);
-            idx_testset(NBLOCK_TRAIN * (idx_cvb(c)-1) + (1:NBLOCK_TRAIN)) = true;
+            idx_testset(1 : (TEST_TRIALS * sum(~CLASS_MASK))) = true;
+            
             % fit logistic lasso 
-            results = runLassoGlm(X, y, idx_testset, options, NCVB_internal);
+            results = runLassoGlm(X, y, idx_testset, options, NCVB_internal, 'lassoglm');
             % record the results
             RESULTS{s}.accuracy(t,c) = results.lasso_accuracy_lambda_min;
             RESULTS{s}.lambda_min(t,c) = results.lasso_lambda_min;
