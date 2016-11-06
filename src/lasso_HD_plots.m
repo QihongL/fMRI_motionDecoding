@@ -21,7 +21,15 @@ NCVB = 5; % 5-folds cross validation
 NCVB_internal = 4;
 
 %% select data
-sim_conditions = {'v1', 'ROIs', 'wb'};
+numROIs = 20; 
+sim_conditions = cell(numROIs,1);
+for roi = 1 : numROIs
+    sim_condition = sprintf('ROI%.2d',roi); 
+    sim_conditions{roi} = sim_condition; 
+end
+sim_conditions{numROIs+1,1} = 'ROIs';
+sim_conditions{numROIs+2,1} = 'wb';
+% sim_conditions = {'v1', 'ROIs', 'wb'};
 % sim_conditions = {'wb'};
 
 
@@ -60,6 +68,6 @@ xlim([1 NTR])
 % plot accuracy (averaged across CVBs) over TRs, for each subject separately
 figure(2)
 plotAccuracy_individual(perf, nSubjs, NCVB, NTR, ...
-    SUBJ_NAMES, sim_conditions, chance, alpha, p, 1)
+    SUBJ_NAMES, sim_conditions, chance, alpha, p, 0)
 
 
