@@ -1,27 +1,13 @@
 function plotAccuracy_individual(performance, nSubjs, NCVB, NTR, SUBJ_NAMES, ...
-    sim_conditions, chance, alpha, p, showErrBar)
+    sim_conditions, chance, alpha, p, windowsize, showErrBar)
 
 for s = 1 : nSubjs
     subplot(2, ceil(nSubjs/2), s)
     
     % loop over conditions (voxel subset condition)
-    for i = 1 : length(performance)
-        accuracy = performance{i}.accuracy;
-        
-        % plot the accuracy (error bar is optional) 
-        hold on
-        % SE over CV blocks
-        if showErrBar
-            se = tinv(1 - alpha/2, nSubjs-1) * accuracy.sd(:,s) / sqrt(NCVB);
-            errorbar(1:NTR, accuracy.mean(:,s), se, 'linewidth', p.LW);
-        else
-            plot(1:NTR, accuracy.mean(:,s), 'linewidth', p.LW);
-        end
-        hold off
-        
-    end
+    plotAllConditions()
     
-    % chance level 
+    % chance level
     hline = refline(0,chance);
     hline.Color = 'k';
     
@@ -40,6 +26,30 @@ for s = 1 : nSubjs
     end
 end
 
+
+
+%% helper functions
+    function plotAllConditions()
+        % loop over conditions (voxel subset condition)
+        for i = 1 : length(performance)
+            accuracy = performance{i}.accuracy;
+            
+            % plot the accuracy (error bar is optional)
+            hold on
+            accuracy_timeSeries = accuracy.mean(:,s);
+            if windowsize > 0 
+                accuracy_timeSeries = movingmean(accuracy_timeSeries, windowsize); 
+            end
+            % SE over CV blocks
+            if showErrBar
+                se = tinv(1 - alpha/2, nSubjs-1) * accuracy.sd(:,s) / sqrt(NCVB);
+                errorbar(1:NTR, accuracy_timeSeries, se, 'linewidth', p.LW);
+            else
+                plot(1:NTR, accuracy_timeSeries, 'linewidth', p.LW);
+            end
+            hold off
+        end
+    end
 
 end
 

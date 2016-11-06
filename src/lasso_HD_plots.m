@@ -21,23 +21,21 @@ NCVB = 5; % 5-folds cross validation
 NCVB_internal = 4;
 
 %% select data
-numROIs = 20; 
-sim_conditions = cell(numROIs,1);
+windowsize = 5; 
+objective = '3d'; 
+numROIs = 3; 
+sim_conditions = {'wb','ROIs'};
 for roi = 1 : numROIs
     sim_condition = sprintf('ROI%.2d',roi); 
-    sim_conditions{roi} = sim_condition; 
+    sim_conditions{roi+2} = sim_condition; 
 end
-sim_conditions{numROIs+1,1} = 'ROIs';
-sim_conditions{numROIs+2,1} = 'wb';
-% sim_conditions = {'v1', 'ROIs', 'wb'};
-% sim_conditions = {'wb'};
 
 
 %% read result file
 numConditions = length(sim_conditions);
-perf = cell(3,1);
+perf = cell(length(sim_conditions),1);
 for i = 1 : numConditions
-    result_filename = strcat('result_HD_', sim_conditions{i});
+    result_filename = strcat('result_', objective ,'_', sim_conditions{i});
     load(fullfile(DIR.OUT, strcat(result_filename, '.mat')))
     perf{i} = readResults(RESULTS, NTR, nSubjs);
     perf{i}.conditionName = result_filename;
@@ -53,21 +51,23 @@ figure(1)
 hold on
 for i = 1 : numConditions
     analysis_name = strrep(perf{i}.conditionName, '_', ' ');
-    plotAccuracy_mean(perf{i}.accuracy, nSubjs, NCVB, NTR, alpha, p, 0)
+    plotAccuracy_mean(perf{i}.accuracy, nSubjs, NCVB, NTR, alpha, p, windowsize, 0)
 end
 hold off
 hline = refline(0,chance);
 hline.Color = 'k';
-title_text = sprintf('Mean Accuracy: %d subjects', nSubjs);
+title_text = sprintf('Decode %s - Mean Accuracy across %d subjects\n movingAverage window size = %d', ...
+    objective, nSubjs-1, windowsize);
 title(title_text, 'fontsize', p.FS)
 legend(sim_conditions, 'fontsize', p.FS, 'location', 'best')
-ylabel('Mean CV accuracy', 'fontsize', p.FS)
+ylabel('Mean accuracy', 'fontsize', p.FS)
 xlabel('TR', 'fontsize', p.FS)
 xlim([1 NTR])
 
 % plot accuracy (averaged across CVBs) over TRs, for each subject separately
 figure(2)
 plotAccuracy_individual(perf, nSubjs, NCVB, NTR, ...
-    SUBJ_NAMES, sim_conditions, chance, alpha, p, 0)
-
-
+    SUBJ_NAMES, sim_conditions, chance, alpha, p, windowsize, 0)
+suptitle_text = sprintf('Decode %s - Mean Accuracy across CV blocks\n movingAverage window size = %d', ...
+    objective, windowsize);
+suptitle(suptitle_text)
