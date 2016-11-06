@@ -2,7 +2,7 @@ clear variables; clc; close all;
 % specify path information
 DIR.PROJECT = '/Users/Qihong/Dropbox/github/motionDecoding_fMRI/';
 DIR.DATA = fullfile(DIR.PROJECT, '/data/rawdata/');
-DIR.OUT = fullfile(DIR.PROJECT, 'results/');
+DIR.OUT = fullfile(DIR.PROJECT, 'data/');
 
 % constants
 SUBJ_NAMES = {'ah','br','ds','jf','rl'};
@@ -12,7 +12,6 @@ nTR = 16;
 nClasses = 8;
 
 saveTruncatedData = 1;
-% trunc_name = 'v1';
 
 %% only take a subset of the data
 for s = 1:nSubjs
@@ -38,7 +37,7 @@ for s = 1:nSubjs
         trunc_name = sprintf('ROI%.2d',roi);
         %% select the index , get the data
         data.name = trunc_name; 
-        data.ROIind = alldat.ROIs(roi).ROIind;
+        data.ROIind = alldat.ROIs(roi).ROIind';
         data.coords = alldat.ROIs(roi).coords';
         % take the functional data, ordered by TR
         data.detrended = cell(nTR,1);
@@ -54,7 +53,7 @@ for s = 1:nSubjs
         if saveTruncatedData
             fprintf('Truncated data for <%s> is saved to <%s>\n', ...
                 data.subject_name, DIR.DATA);
-            save(strcat(DIR.DATA,data.subject_name,'_',trunc_name),'data');
+            save(strcat(DIR.OUT,data.subject_name,'_',trunc_name),'data');
         end
     end
 end
