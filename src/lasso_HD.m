@@ -8,46 +8,46 @@ seed = 1; rng(seed);    % for reproducibility
 
 analysis_names = {'wb', 'ROIs'};
 for roi = 1 : 20
-    analysis_names{roi+2} = sprintf('ROI%.2d',roi); 
+    analysis_names{roi+2} = sprintf('ROI%.2d',roi);
 end
+
+% analysis_names = {'ROI01'} %%% 
+
+% specify path information
+DIR.PROJECT = '..';
+DIR.DATA = fullfile(DIR.PROJECT, 'data/');
+DIR.OUT = fullfile(DIR.PROJECT, 'results/');
+model_name = 'logistic lasso with min dev lambda';
+decodingObjective = '3d';
+
+% parameters
+NCVB = 5; % 5-folds cross validation
+NCVB_internal = 4;
+TEST_TRIALS = 4;
+options.nlambda = 50;
+options.alpha = 1;
+saveResults = 1;
+
+% CONSTANTS (should not be changed)
+SUBJ_NAMES = {'ah','br','ds','jf','rl'};
+NTR = 16;
+NRUNS = 10;
+CVB_UNIT = NRUNS/NCVB;
+NBLOCK_TRAIN = CVB_UNIT * (NCVB-1);
+
+% set up target vectors
+Y_LABELS = 0: pi/2 : (2*pi - pi/4);
+[y, ROW_MASK, unit_mask] = getMaskAndRange(decodingObjective, NRUNS);
 
 for roi = 1 : length(analysis_names)
     fprintf('%s \n', analysis_names{roi})
-    
-    model_name = 'logistic lasso with min dev lambda';
-    decodingObjective = '2d'; 
-    
-    % specify path information
-    DIR.PROJECT = '..';
-    DIR.DATA = fullfile(DIR.PROJECT, 'data/');
-    DIR.OUT = fullfile(DIR.PROJECT, 'results/');
-    % parameters
-    NCVB = 5; % 5-folds cross validation
-    NCVB_internal = 4;
-    TEST_TRIALS = 4;
-    options.nlambda = 50;
-    options.alpha = 1;
-    saveResults = 1;
-    
-    % CONSTANTS (should not be changed)
-    SUBJ_NAMES = {'ah','br','ds','jf','rl'};
-    NTR = 16;
-    NRUNS = 10;
-    CVB_UNIT = NRUNS/NCVB;
-    NBLOCK_TRAIN = CVB_UNIT * (NCVB-1);
-    Y_LABELS = 0: pi/2 : (2*pi - pi/4);
-    
-    % set up target vectors
-    [y, ROW_MASK, unit_mask] = getMaskAndRange(decodingObjective, NRUNS); 
-    
+        
     % specify parameters
     nSubjs = length(SUBJ_NAMES);
     FILENAMES = strcat(SUBJ_NAMES, {strcat('_', analysis_names{roi}, '.mat')});
     
-    
     %% decode
     fprintf('The results will be saved to <%s>.\n', DIR.OUT);
-    
     
     RESULTS = cell(nSubjs,1);
     % loop over subjects
@@ -57,7 +57,7 @@ for roi = 1 : length(analysis_names)
         
         RESULTS{s}.subj_name = SUBJ_NAMES{s};
         RESULTS{s}.method = model_name;
-        RESULTS{s}.objective = decodingObjective; 
+        RESULTS{s}.objective = decodingObjective;
         RESULTS{s}.features = analysis_names{roi};
         RESULTS{s}.nLambda = options.nlambda;
         
@@ -93,7 +93,7 @@ for roi = 1 : length(analysis_names)
     
     %% save the result file to an output dir
     if saveResults
-        saveFileName = strcat('result_3d_',analysis_names{roi});
+        saveFileName = strcat('result_',decodingObjective,'_',analysis_names{roi});
         save(strcat(DIR.OUT,saveFileName, '.mat'), 'RESULTS')
     end
     
