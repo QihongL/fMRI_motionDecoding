@@ -1,11 +1,14 @@
 function plotAccuracy_individual(performance, nSubjs, NCVB, NTR, SUBJ_NAMES, ...
     sim_conditions, chance, alpha, p, showErrBar)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+
 for s = 1 : nSubjs
     subplot(2, ceil(nSubjs/2), s)
+    
+    % loop over conditions (voxel subset condition)
     for i = 1 : length(performance)
         accuracy = performance{i}.accuracy;
+        
+        % plot the accuracy (error bar is optional) 
         hold on
         % SE over CV blocks
         if showErrBar
@@ -18,9 +21,11 @@ for s = 1 : nSubjs
         
     end
     
+    % chance level 
     hline = refline(0,chance);
     hline.Color = 'k';
     
+    % add descriptions
     title_text = sprintf('Subject: %s ', SUBJ_NAMES{s});
     title(title_text, 'fontsize', p.FS)
     
@@ -29,6 +34,7 @@ for s = 1 : nSubjs
     ylim([.2 1])
     xlim([1 NTR])
     
+    % only show the legend for the last subj
     if s == nSubjs
         legend(sim_conditions, 'fontsize', p.FS, 'location', 'best')
     end

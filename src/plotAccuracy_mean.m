@@ -1,5 +1,11 @@
 function plotAccuracy_mean(accuracy, nSubjs, NCVB, NTR, alpha, p, showErrBar)
 
+
+exclude = 5; 
+accuracy.mean(:,exclude) = [];
+accuracy.sd(:,exclude) = [];
+nSubjs = nSubjs - length(exclude);
+
 if showErrBar
     % SE over subjects
     se = tinv(1 - alpha/2, nSubjs-1) * std(accuracy.mean,0,2) / sqrt(NCVB);
