@@ -40,6 +40,7 @@ end
 
 function y_thresholded = predictionThresholding(y_raw_prediction)
 y_thresholded = round(y_raw_prediction);
+% TODO: you shouldn't need the following two lines, since logistic 
 y_thresholded(y_thresholded > 1) = 1; 
 y_thresholded(y_thresholded < 0) = 0; 
 
