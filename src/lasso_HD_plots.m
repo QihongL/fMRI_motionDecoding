@@ -13,6 +13,7 @@ DIR.PROJECT = '/Users/Qihong/Dropbox/github/motionDecoding_fMRI/';
 DIR.OUT = fullfile(DIR.PROJECT, 'results/');
 % CONSTANTS (should not be changed)
 SUBJ_NAMES = {'ah','br','ds','jf','rl'};
+
 NTR = 16;
 nSubjs = length(SUBJ_NAMES);
 chance = .5;
@@ -21,9 +22,9 @@ NCVB = 5; % 5-folds cross validation
 NCVB_internal = 4;
 
 %% select data
-windowsize = 5; 
+windowsize = 0; 
 objective = '3d'; 
-numROIs = 3; 
+numROIs = 7; 
 sim_conditions = {'wb','ROIs'};
 for roi = 1 : numROIs
     sim_condition = sprintf('ROI%.2d',roi); 
@@ -45,6 +46,7 @@ end
 p.FS = 14;
 p.LW = 2;
 alpha = .05;
+sim_conditions = labelROInames(sim_conditions);
 
 % plot mean accuracy (averaged across all subjects) over TRs
 figure(1)
@@ -63,6 +65,7 @@ legend(sim_conditions, 'fontsize', p.FS, 'location', 'best')
 ylabel('Mean accuracy', 'fontsize', p.FS)
 xlabel('TR', 'fontsize', p.FS)
 xlim([1 NTR])
+
 
 % plot accuracy (averaged across CVBs) over TRs, for each subject separately
 figure(2)
