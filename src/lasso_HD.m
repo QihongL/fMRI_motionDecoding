@@ -11,12 +11,10 @@ for roi = 1 : 20
     analysis_names{roi+2} = sprintf('ROI%.2d',roi);
 end
 
-% analysis_names = {'ROI01'} %%% 
-
 % specify path information
-DIR.PROJECT = '..';
-DIR.DATA = fullfile(DIR.PROJECT, 'data/');
-DIR.OUT = fullfile(DIR.PROJECT, 'results/');
+DIR.ROOT = '..';
+DIR.DATA = fullfile(DIR.ROOT, 'data/');
+DIR.OUT = fullfile(DIR.ROOT, 'results/');
 model_name = 'logistic lasso with min dev lambda';
 decodingObjective = '3d';
 
@@ -24,7 +22,7 @@ decodingObjective = '3d';
 NCVB = 5; % 5-folds cross validation
 NCVB_internal = 4;
 TEST_TRIALS = 4;
-options.nlambda = 50;
+options.nlambda = 100;
 options.alpha = 1;
 saveResults = 1;
 
@@ -72,8 +70,6 @@ for roi = 1 : length(analysis_names)
             % select horizontal-depth data
             X = data.detrended{t}(~ROW_MASK,:);
             
-            % TODO: for replication purpose, I should gen idx once and save them
-            idx_cvb = randperm(NCVB);
             % decode for all CVB
             for c = 1 : NCVB
                 % set up the test index
@@ -93,7 +89,7 @@ for roi = 1 : length(analysis_names)
     
     %% save the result file to an output dir
     if saveResults
-        saveFileName = strcat('result_',decodingObjective,'_',analysis_names{roi});
+        saveFileName = strcat('result_std_',decodingObjective,'_',analysis_names{roi});
         save(strcat(DIR.OUT,saveFileName, '.mat'), 'RESULTS')
     end
     

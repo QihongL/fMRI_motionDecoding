@@ -1,11 +1,12 @@
 function results = runLassoGlm(X, y, testIdx, options, CVB, method)
-
-% hold out the test set
+%% hold out the test set
 X_train = X(~testIdx,:);
 X_test = X(testIdx,:);
 y_train = y(~testIdx);
 y_test = y(testIdx);
 
+%% voxel-wise standardization
+[X_train, X_test] = columnNormalization(X_train, X_test);
 
 %% cvfit lasso with with CVGLMNET
 if strcmp(method, 'glmnet')
@@ -30,11 +31,12 @@ end
 % save coeff
 results.lasso_lambda_min = min_lambda;
 results.lasso_coef_lambda_min = coef;
-y_hat = predictionThresholding(y_hat);
+y_hat = thresholding(y_hat);
 results.lasso_accuracy_lambda_min = sum(y_hat == y_test) / length(y_test);
 end
 
-function y_thresholded = predictionThresholding(y_raw_prediction)
-y_thresholded = round(y_raw_prediction);
+function y_thresholded = thresholding(y_raw_prediction)
+    y_thresholded = round(y_raw_prediction);
 end
+
 
