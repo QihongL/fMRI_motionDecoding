@@ -30,11 +30,8 @@ saveResults = 1;
 SUBJ_NAMES = {'ah','br','ds','jf','rl'};
 NTR = 16;
 NRUNS = 10;
-CVB_UNIT = NRUNS/NCVB;
-NBLOCK_TRAIN = CVB_UNIT * (NCVB-1);
 
 % set up target vectors
-Y_LABELS = 0: pi/2 : (2*pi - pi/4);
 [y, ROW_MASK, unit_mask] = getMaskAndRange(decodingObjective, NRUNS);
 
 for roi = 1 : length(analysis_names)
