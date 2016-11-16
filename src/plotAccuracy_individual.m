@@ -29,7 +29,7 @@ end
 
 
 %% helper functions
-    function plotAllConditions()
+    function P = plotAllConditions()
         % loop over conditions (voxel subset condition)
         for i = 1 : length(performance)
             accuracy = performance{i}.accuracy;
@@ -44,8 +44,9 @@ end
             if showErrBar
                 se = tinv(1 - alpha/2, nSubjs-1) * accuracy.sd(:,s) / sqrt(NCVB);
                 errorbar(1:NTR, accuracy_timeSeries, se, 'linewidth', p.LW);
+                
             else
-                plot(1:NTR, accuracy_timeSeries, 'linewidth', p.LW);
+                P = plot(1:NTR, accuracy_timeSeries, 'linewidth', p.LW);
             end
             hold off
         end
