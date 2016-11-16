@@ -6,9 +6,10 @@
 clear variables; clc; close all;
 seed = 1; rng(seed);    % for reproducibility
 
-analysis_names = {'wb', 'ROIs'};
-for roi = 1 : 20
-    analysis_names{roi+2} = sprintf('ROI%.2d',roi);
+% analysis_names = {'wb', 'ROIs'};
+analysis_names = {}; 
+for roi = 13 : 20
+    analysis_names{length(analysis_names)+1} = sprintf('ROI%.2d',roi);
 end
 
 % specify path information
@@ -16,13 +17,13 @@ DIR.ROOT = '..';
 DIR.DATA = fullfile(DIR.ROOT, 'data/');
 DIR.OUT = fullfile(DIR.ROOT, 'results/');
 model_name = 'logistic lasso with min dev lambda';
-decodingObjective = '3d';
+decodingObjective = '2d';
 
 % parameters
 NCVB = 5; % 5-folds cross validation
 NCVB_internal = 4;
 TEST_TRIALS = 4;
-options.nlambda = 100;
+options.nlambda = 50;
 options.alpha = 1;
 saveResults = 1;
 
@@ -79,6 +80,7 @@ for roi = 1 : length(analysis_names)
                 RESULTS{s}.accuracy(t,c) = results.lasso_accuracy_lambda_min;
                 RESULTS{s}.lambda_min(t,c) = results.lasso_lambda_min;
                 RESULTS{s}.coef(:,c,t) = results.lasso_coef_lambda_min;
+                
             end
         end
         fprintf('\n');
