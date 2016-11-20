@@ -6,6 +6,10 @@ In particular, I am using sparse MVPA methods to decode motion and depth percept
 
 For example, here's the horizontal decoding accuracy plot, for each subject, over time. 
 <img src = "https://github.com/QihongL/fMRI_motionDecoding/blob/master/plots/compare_acc_sub_eb.png">
+* Legend
+ * wb = whole brain 
+ * ROIs = pooling all voxels from 20 vision related ROIs
+ * v1 = the primary visual cortex
 
 <br>
 <h3>Data</h3>
