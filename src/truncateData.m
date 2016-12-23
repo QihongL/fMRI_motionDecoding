@@ -33,12 +33,17 @@ for s = 1:nSubjs
     %     %% take whole cortex
     %     idx_cortex = alldat.grayinds;
     
+    
+    idx_outside = alldat.grayinds;
+    
     for roi = 1 : length(alldat.ROIs)
         trunc_name = sprintf('ROI%.2d',roi);
         %% select the index , get the data
-        data.name = trunc_name; 
+        data.name = trunc_name;
         data.ROIind = alldat.ROIs(roi).ROIind';
         data.coords = alldat.ROIs(roi).coords';
+        idx_outside = setdiff(idx_outside,data.ROIind);
+        
         % take the functional data, ordered by TR
         data.detrended = cell(nTR,1);
         for t = 1 : nTR
@@ -48,12 +53,35 @@ for s = 1:nSubjs
                     alldat.detrendedData{run}(:,data.ROIind,t));
             end
         end
-        
+               
         % save data
         if saveTruncatedData
             fprintf('Truncated data for <%s> is saved to <%s>\n', ...
                 data.subject_name, DIR.DATA);
             save(strcat(DIR.OUT,data.subject_name,'_',trunc_name),'data');
         end
+    end
+    
+    % get all data outside of the 20 ROIs
+    data.subject_name = SUBJ_NAMES{s};
+    data.title = 'detrened_data';
+    data.ROIs = alldat.ROIs;
+    trunc_name = 'outside';
+    data.name = trunc_name;
+    data.ROIind = idx_outside;
+    data.coords = alldat.coords(idx_outside,:);
+    % collect bold signal
+    data.detrended = cell(nTR,1);
+    for t = 1 : nTR
+        for run = 1 : length(alldat.detrendedData)
+            data.detrended{t} = vertcat(data.detrended{t}, ...
+                alldat.detrendedData{run}(:,idx_outside,t));
+        end
+    end
+    % save data
+    if saveTruncatedData
+        fprintf('Truncated data for <%s> is saved to <%s>\n', ...
+            data.subject_name, DIR.DATA);
+        save(strcat(DIR.OUT,data.subject_name,'_',trunc_name),'data');
     end
 end

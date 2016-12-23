@@ -21,20 +21,20 @@ NCVB_internal = 4;
 
 %% select data
 filestem = 'result_std';
-objective = '3d';
+objective = '2d';
 showErrBar = 1;
 windowSize = 0;
-plotByCondition = 1;
+plotByCondition = 0;
 
 numROIs = 20;
 idx_deletedROI = 12;
-sim_conditions = {'wb','ROIs'};
+sim_conditions = {'wb','ROIs','outside'};
 % sim_conditions = {'ROI16'};
-for roi = 1 : numROIs
+for roi = 1 
     sim_condition = sprintf('ROI%.2d',roi);
     sim_conditions{length(sim_conditions)+1} = sim_condition;
 end
-sim_conditions(idx_deletedROI + 2) =[];
+% sim_conditions(idx_deletedROI + 2) =[];
 
 %% read result file
 numConditions = length(sim_conditions);
@@ -52,7 +52,7 @@ end
 p.FS = 14;
 p.LW = 2;
 alpha = .05;
-sim_conditions(2+1:length(sim_conditions)) = labelROInames(numROIs, idx_deletedROI);
+% sim_conditions(2+1:length(sim_conditions)) = labelROInames(numROIs, idx_deletedROI);
 
 %% plot mean accuracy (averaged across all subjects) over TRs
 
@@ -113,16 +113,16 @@ end
 
 %% plot accuracy (averaged across CVBs) over TRs, for each subject separately
 
-% for i = 1 : length(sim_conditions)
-% %     figure(i + 10)
-%     figure('Visible','off')
-%
-%     plotAccuracy_individual(perf(i), NSUBJ, NCVB, NTR, ...
-%         SUBJ_NAMES, sim_conditions(i), CHANCE, alpha, p, windowSize, showErrBar)
-%     suptitle_text = sprintf('Decode %s - Mean Accuracy across CV blocks\n movingAverage window size = %d', ...
-%         objective, windowSize);
-%     suptitle(suptitle_text)
-%
-%     picname = sprintf('../plots/3d_sub_roi/im%.2d_%s.png', i,sim_conditions{i});
-%     saveas(gcf,picname,'png')
-% end
+for i = 1 : length(sim_conditions)
+%     figure(i + 10)
+    figure('Visible','off')
+
+    plotAccuracy_individual(perf(i), NSUBJ, NCVB, NTR, ...
+        SUBJ_NAMES, sim_conditions(i), CHANCE, alpha, p, windowSize, showErrBar)
+    suptitle_text = sprintf('Decode %s - Mean Accuracy across CV blocks\n movingAverage window size = %d', ...
+        objective, windowSize);
+    suptitle(suptitle_text)
+
+    picname = sprintf('../plots/3d_sub_roi/im%.2d_%s.png', i,sim_conditions{i});
+    saveas(gcf,picname,'png')
+end

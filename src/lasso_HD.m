@@ -1,3 +1,4 @@
+
 %% Do some quick analysis for the ROKERS motion direction data
 % plan: fit the model using
 %   1. all voxels in the cortex
@@ -6,11 +7,13 @@
 clear variables; clc; close all;
 seed = 1; rng(seed);    % for reproducibility
 
-% analysis_names = {'wb', 'ROIs'};
 analysis_names = {}; 
-for roi = 13 : 20
-    analysis_names{length(analysis_names)+1} = sprintf('ROI%.2d',roi);
-end
+analysis_names = {'wb', 'ROIs', 'outside'};
+analysis_names = {'outside'};
+
+% for roi = 13 : 20
+%     analysis_names{length(analysis_names)+1} = sprintf('ROI%.2d',roi);
+% end
 
 % specify path information
 DIR.ROOT = '..';

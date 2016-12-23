@@ -1,9 +1,9 @@
-clear variables; clf;
+clear variables; 
 analysis_names = {'wb', 'ROI01'};
 
 % specify path information
 DIR.ROOT = '..';
-DIR.DATA = fullfile(DIR.ROOT, 'data/');
+DIR.DATA = fullfile(DIR.ROOT, 'demo/');
 DIR.OUT = fullfile(DIR.ROOT, 'results/');
 model_name = 'logistic lasso with min dev lambda';
 decodingObjective = '2d';
@@ -14,7 +14,7 @@ NCVB_internal = 4;
 TEST_TRIALS = 4;
 options.nlambda = 100;
 options.alpha = 1;
-saveResults = 1;
+
 
 % CONSTANTS (should not be changed)
 SUBJ_NAMES = {'ah'};
@@ -51,6 +51,7 @@ for roi = 1 : length(analysis_names)
             
             % fit logistic lasso
             % YOUR CODE HERE! 
+            runLassoGlm(X, y, idx_testset, options, NCVB, 'lassoglm')
             
             % record the results
             RESULTS.accuracy(t,c) = results.lasso_accuracy_lambda_min;
