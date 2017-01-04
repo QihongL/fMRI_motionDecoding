@@ -1,4 +1,3 @@
-
 %% Do some quick analysis for the ROKERS motion direction data
 % plan: fit the model using
 %   1. all voxels in the cortex
@@ -9,7 +8,6 @@ seed = 1; rng(seed);    % for reproducibility
 
 analysis_names = {}; 
 analysis_names = {'wb', 'ROIs', 'outside'};
-analysis_names = {'outside'};
 
 % for roi = 13 : 20
 %     analysis_names{length(analysis_names)+1} = sprintf('ROI%.2d',roi);
@@ -20,7 +18,8 @@ DIR.ROOT = '..';
 DIR.DATA = fullfile(DIR.ROOT, 'data/');
 DIR.OUT = fullfile(DIR.ROOT, 'results/');
 model_name = 'logistic lasso with min dev lambda';
-decodingObjective = '2d';
+objectives = {'2d','3d','multinomial'};
+objective = objectives{3};
 
 % parameters
 NCVB = 5; % 5-folds cross validation
@@ -36,7 +35,7 @@ NTR = 16;
 NRUNS = 10;
 
 % set up target vectors
-[y, ROW_MASK, unit_mask] = getMaskAndRange(decodingObjective, NRUNS);
+[y, ROW_MASK, unit_mask] = getMaskAndRange(objective, NRUNS);
 
 for roi = 1 : length(analysis_names)
     fprintf('%s \n', analysis_names{roi})
@@ -56,7 +55,7 @@ for roi = 1 : length(analysis_names)
         
         RESULTS{s}.subj_name = SUBJ_NAMES{s};
         RESULTS{s}.method = model_name;
-        RESULTS{s}.objective = decodingObjective;
+        RESULTS{s}.objective = objective;
         RESULTS{s}.features = analysis_names{roi};
         RESULTS{s}.nLambda = options.nlambda;
         
@@ -77,7 +76,7 @@ for roi = 1 : length(analysis_names)
                 idx_testset = false(size(X,1),1);
                 idx_testset(1 : (TEST_TRIALS * sum(~unit_mask))) = true;
                 
-                % fit logistic lasso
+                % fit logistic lasso    
                 results = runLassoGlm(X, y, idx_testset, options, NCVB_internal, 'lassoglm');
                 % record the results
                 RESULTS{s}.accuracy(t,c) = results.lasso_accuracy_lambda_min;
@@ -91,7 +90,7 @@ for roi = 1 : length(analysis_names)
     
     %% save the result file to an output dir
     if saveResults
-        saveFileName = strcat('result_std_',decodingObjective,'_',analysis_names{roi});
+        saveFileName = strcat('result_std_',objective,'_',analysis_names{roi});
         save(strcat(DIR.OUT,saveFileName, '.mat'), 'RESULTS')
     end
     
