@@ -3,7 +3,7 @@ analysis_names = {'wb', 'ROI01'};
 
 % specify path information
 DIR.ROOT = '..';
-DIR.DATA = fullfile(DIR.ROOT, 'demo/');
+DIR.DATA = fullfile(DIR.ROOT, 'demo_data/');
 DIR.OUT = fullfile(DIR.ROOT, 'results/');
 model_name = 'logistic lasso with min dev lambda';
 decodingObjective = '2d';
@@ -39,6 +39,8 @@ for roi = 1 : length(analysis_names)
             
             % fit logistic lasso
             % YOUR CODE HERE! 
+            
+
                         
         end
     end
