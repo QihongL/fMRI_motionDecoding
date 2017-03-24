@@ -19,7 +19,7 @@ DIR.DATA = fullfile(DIR.ROOT, 'data/');
 DIR.OUT = fullfile(DIR.ROOT, 'results/');
 model_name = 'logistic lasso with min dev lambda';
 objectives = {'2d','3d','multinomial'};
-objective = objectives{3};
+objective = objectives{1};
 
 % parameters
 NCVB = 5; % 5-folds cross validation
