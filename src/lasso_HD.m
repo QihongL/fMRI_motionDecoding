@@ -6,7 +6,7 @@
 clear variables; clc; close all;
 seed = 1; rng(seed);    % for reproducibility
 
-analysis_names = {}; 
+analysis_names = {};
 analysis_names = {'wb', 'ROIs', 'outside'};
 
 % for roi = 13 : 20
@@ -20,6 +20,7 @@ DIR.OUT = fullfile(DIR.ROOT, 'results/');
 model_name = 'logistic lasso with min dev lambda';
 objectives = {'2d','3d','multinomial'};
 objective = objectives{1};
+iterlasso = true;
 
 % parameters
 NCVB = 5; % 5-folds cross validation
@@ -39,7 +40,7 @@ NRUNS = 10;
 
 for roi = 1 : length(analysis_names)
     fprintf('%s \n', analysis_names{roi})
-        
+    
     % specify parameters
     nSubjs = length(SUBJ_NAMES);
     FILENAMES = strcat(SUBJ_NAMES, {strcat('_', analysis_names{roi}, '.mat')});
@@ -66,23 +67,30 @@ for roi = 1 : length(analysis_names)
         % loop over TR ("time")
         for t = 1 : NTR
             fprintf('%d ', t);
-            
             % select horizontal-depth data
             X = data.detrended{t}(~ROW_MASK,:);
             
-            % decode for all CVB
-            for c = 1 : NCVB
-                % set up the test index
-                idx_testset = false(size(X,1),1);
-                idx_testset(1 : (TEST_TRIALS * sum(~unit_mask))) = true;
-                
-                % fit logistic lasso    
-                results = runLassoGlm(X, y, idx_testset, options, NCVB_internal, 'lassoglm');
-                % record the results
-                RESULTS{s}.accuracy(t,c) = results.lasso_accuracy_lambda_min;
-                RESULTS{s}.lambda_min(t,c) = results.lasso_lambda_min;
-                RESULTS{s}.coef(:,c,t) = results.lasso_coef_lambda_min;
-                
+            if iterlasso
+                nPossibleLabels = 6; 
+                options.alpha = 1; 
+                options.nLambda = 50;
+                chance = .5; 
+                cv_idx = reshape(repmat([1:NCVB],nPossibleLabels * (NRUNS/NCVB),1),NCVB * nPossibleLabels * (NRUNS/NCVB),1);
+                RESULTS{s} = runIterLasso(X,y,cv_idx,options,NCVB_internal,chance);
+            else
+                % decode for all CVB
+                for c = 1 : NCVB
+                    % set up the test index
+                    idx_testset = false(size(X,1),1);
+                    idx_testset(1 : (TEST_TRIALS * sum(~unit_mask))) = true;
+                    
+                    % fit logistic lasso
+                    results = runLassoGlm(X, y, idx_testset, options, NCVB_internal, 'lassoglm');
+                    % record the results
+                    RESULTS{s}.accuracy(t,c) = results.lasso_accuracy_lambda_min;
+                    RESULTS{s}.lambda_min(t,c) = results.lasso_lambda_min;
+                    RESULTS{s}.coef(:,c,t) = results.lasso_coef_lambda_min;
+                end
             end
         end
         fprintf('\n');
@@ -90,7 +98,7 @@ for roi = 1 : length(analysis_names)
     
     %% save the result file to an output dir
     if saveResults
-        saveFileName = strcat('result_std_',objective,'_',analysis_names{roi});
+        saveFileName = strcat('result_ilasso_',objective,'_',analysis_names{roi});
         save(strcat(DIR.OUT,saveFileName, '.mat'), 'RESULTS')
     end
     
