@@ -26,6 +26,7 @@ while true
         X_test = X(testIdx,:);
         y_train = y(~testIdx);
         y_test = y(testIdx);
+        [X_train, X_test] = columnNormalization(X_train, X_test);
         
         % mask out selected voxel!
         if iter > 1
@@ -42,7 +43,7 @@ while true
         % record lambda, beta, cv accuracy
         min_lambda_coefs{c} = coef;
         min_lambdas(c) = FitInfo.Lambda(FitInfo.IndexMinDeviance);
-        accuracies(c) = sum(y_hat == y_test) / length(y_test); 
+        accuracies(c) = sum(round(y_hat) == y_test) / length(y_test); 
         voxSel{c} = find(coef(2:end) ~= 0);
         
         % record voxels ever selected

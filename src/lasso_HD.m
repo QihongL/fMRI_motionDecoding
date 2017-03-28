@@ -7,7 +7,7 @@ clear variables; clc; close all;
 seed = 1; rng(seed);    % for reproducibility
 
 analysis_names = {};
-analysis_names = {'wb', 'ROIs', 'outside'};
+analysis_names = { 'ROIs', 'outside','wb'};
 
 % for roi = 13 : 20
 %     analysis_names{length(analysis_names)+1} = sprintf('ROI%.2d',roi);
@@ -20,7 +20,7 @@ DIR.OUT = fullfile(DIR.ROOT, 'results/');
 model_name = 'logistic lasso with min dev lambda';
 objectives = {'2d','3d','multinomial'};
 objective = objectives{1};
-iterlasso = true;
+iterlasso = 1
 
 % parameters
 NCVB = 5; % 5-folds cross validation
@@ -65,7 +65,10 @@ for roi = 1 : length(analysis_names)
         RESULTS{s}.lambda_min = nan(NTR,NCVB);
         RESULTS{s}.coef = nan(size(data.coords,1)+1,NCVB, NTR);
         % loop over TR ("time")
-        for t = 1 : NTR
+        if iterlasso
+            RESULTS{s}.result = cell(NTR,1); 
+        end
+         for t = 1 : NTR
             fprintf('%d ', t);
             % select horizontal-depth data
             X = data.detrended{t}(~ROW_MASK,:);
@@ -76,7 +79,7 @@ for roi = 1 : length(analysis_names)
                 options.nLambda = 50;
                 chance = .5; 
                 cv_idx = reshape(repmat([1:NCVB],nPossibleLabels * (NRUNS/NCVB),1),NCVB * nPossibleLabels * (NRUNS/NCVB),1);
-                RESULTS{s} = runIterLasso(X,y,cv_idx,options,NCVB_internal,chance);
+                RESULTS{s}.result{t} = runIterLasso(X,y,cv_idx,options,NCVB_internal,chance);
             else
                 % decode for all CVB
                 for c = 1 : NCVB
