@@ -20,7 +20,7 @@ DIR.OUT = fullfile(DIR.ROOT, 'results/');
 model_name = 'logistic lasso with min dev lambda';
 objectives = {'2d','3d','multinomial'};
 objective = objectives{1};
-iterlasso = 1
+iterlasso = 0
 
 % parameters
 NCVB = 5; % 5-folds cross validation
@@ -28,7 +28,7 @@ NCVB_internal = 4;
 TEST_TRIALS = 4;
 options.nlambda = 50;
 options.alpha = 1;
-saveResults = 1;
+saveResults = 0;
 
 % CONSTANTS (should not be changed)
 SUBJ_NAMES = {'ah','br','ds','jf','rl'};
@@ -88,7 +88,7 @@ for roi = 1 : length(analysis_names)
                     idx_testset(1 : (TEST_TRIALS * sum(~unit_mask))) = true;
                     
                     % fit logistic lasso
-                    results = runLassoGlm(X, y, idx_testset, options, NCVB_internal, 'lassoglm');
+                    results = runLassoGlm(X, y, idx_testset, options, NCVB_internal, 'glmnet');
                     % record the results
                     RESULTS{s}.accuracy(t,c) = results.lasso_accuracy_lambda_min;
                     RESULTS{s}.lambda_min(t,c) = results.lasso_lambda_min;
