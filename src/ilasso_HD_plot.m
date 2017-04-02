@@ -8,6 +8,8 @@ DIR.ROOT = '..';
 DIR.DATA = fullfile(DIR.ROOT, 'data/');
 DIR.OUT = fullfile(DIR.ROOT, 'results/');
 DIR.PLOT = fullfile(DIR.ROOT, 'plots/ilasso/');
+DIR.VOXMAP = fullfile(DIR.PLOT, 'voxSelMap_by_cond_subj');
+
 
 % CONSTANTS (should not be changed)
 SUBJ_NAMES = {'ah','br','ds','jf','rl'};
@@ -66,6 +68,7 @@ alpha = .05;
 
 
 % %% plot voxels on the brain
+% saveVoxMap = 0; 
 % for c = 1 : length(CONDS)
 %     cond = CONDS{c};
 %     for s = 1 : NSUBJ
@@ -73,57 +76,52 @@ alpha = .05;
 %         data_fname = sprintf('%s_%s.mat',subj_name, cond);
 %         load(fullfile(DIR.DATA, data_fname))
 %         for t = 1 : NTR
-%             subplot(4,4,t)
-%             scatter3(data.coords(:,1),data.coords(:,2),data.coords(:,3),'.')
-%             hold on
-%             voxSel_coords = data.coords(voxSets{c,s,t},:);
-%             scatter3(voxSel_coords(:,1),voxSel_coords(:,2),voxSel_coords(:,3),...
-%                 'r', 'linewidth', 2)
+%             fig = subplot(4,4,t);
 %             title_text = sprintf('TR = %d', t);
-%             title(title_text)
-%             hold off
+%             plotVoxelMap(data.coords, data.coords(voxSets{c,s,t},:), title_text); 
 %         end
-%         suptitle_text = sprintf('%s - %s', subj_name, cond);
+%         suptitle_text = sprintf('%s_%s', subj_name, cond);
 %         suptitle(suptitle_text);
-%         temp = 0;
+%         if saveVoxMap
+%             saveas(fig,fullfile(DIR.VOXMAP,suptitle_text))
+%         end
 %     end
 % end
 
 
 
-%% plot num voxels selected across different conditions over time ...
-load ../data/vox_idx.mat
-for s = 1 : NSUBJ
-    for c = 2 % whole brain 
-        cond = CONDS{c};
-        subj_name = SUBJ_NAMES{s};
-        for t = 1 : NTR
-            vox_sel_idx = vox_idx(s).gray(voxSets{c,s,t}); 
-            nVox.inROI(s,t) = length(intersect(vox_sel_idx,vox_idx(s).ROIs_all));
-            nVox.total(s,t) = length(vox_idx(s).gray(voxSets{c,s,t}));
-        end
-    end
-end
+% %% plot num voxels selected across different conditions over time ...
+% load ../data/vox_idx.mat
+% for s = 1 : NSUBJ
+%     for c = 2 % whole brain 
+%         cond = CONDS{c};
+%         subj_name = SUBJ_NAMES{s};
+%         for t = 1 : NTR
+%             vox_sel_idx = vox_idx(s).gray(voxSets{c,s,t}); 
+%             nVox.inROI(s,t) = length(intersect(vox_sel_idx,vox_idx(s).ROIs_all));
+%             nVox.total(s,t) = length(vox_idx(s).gray(voxSets{c,s,t}));
+%         end
+%     end
+% end
+% 
+% plot([nVox.inROI ./ nVox.total]', 'linewidth',LW)
+% legend(SUBJ_NAMES,'location','SW')
+% xlabel('TR')
+% ylabel('vox within ROIs / vox total (%)')
+% title('% voxel selected in the ROIs')
 
-plot([nVox.inROI ./ nVox.total]', 'linewidth',LW)
-legend(SUBJ_NAMES,'location','SW')
-xlabel('TR')
-ylabel('vox within ROIs / vox total (%)')
-title('% voxel selected in the ROIs')
 
-
-
-for c = 1 : length(CONDS)
-    cond = CONDS{c};
-    for s = 1 : NSUBJ
-        subj_name = SUBJ_NAMES{s};
-        data_fname = sprintf('%s_%s.mat',subj_name, cond);
-        load(fullfile(DIR.DATA, data_fname))
-        
-        
-        
-        for t = 1 : NTR
-            %             voxSets{c,s,t}
-        end
-    end
-end
+% for c = 1 : length(CONDS)
+%     cond = CONDS{c};
+%     for s = 1 : NSUBJ
+%         subj_name = SUBJ_NAMES{s};
+%         data_fname = sprintf('%s_%s.mat',subj_name, cond);
+%         load(fullfile(DIR.DATA, data_fname))
+%         
+%         
+%         
+%         for t = 1 : NTR
+%             %             voxSets{c,s,t}
+%         end
+%     end
+% end
