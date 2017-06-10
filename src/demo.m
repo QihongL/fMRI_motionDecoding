@@ -36,8 +36,20 @@ for roi = 1
         
         % fit logistic lasso
         % YOUR CODE HERE!
-        %% hold out the test set
-
+        % 1. separate training and test set 
+        X_train = X(~idx_testset,:);
+        y_train = y(~idx_testset);
+        X_test = X(idx_testset,:);
+        y_test = y(idx_testset);
+        % 2. fit the model with the training set 
+        [B,STATS] = lassoglm(X_train, y_train, 'binomial');
+        best_idx = min(STATS.Deviance) == STATS.Deviance;
+        coef = [STATS.Intercept(best_idx); B(:,best_idx)];
+        % 3. eval the model with the test set 
+        y_hat = glmval(coef,X_test,'logit');
+        sum(round(y_hat) == y_test) / length(y_test)
+        
+        
         
     end
 end

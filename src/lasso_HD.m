@@ -7,7 +7,7 @@ clear variables; clc; close all;
 seed = 1; rng(seed);    % for reproducibility
 
 analysis_names = {};
-analysis_names = { 'ROIs', 'outside','wb'};
+analysis_names = {'ROIs', 'outside', 'wb'};
 
 % for roi = 13 : 20
 %     analysis_names{length(analysis_names)+1} = sprintf('ROI%.2d',roi);

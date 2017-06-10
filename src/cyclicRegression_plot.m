@@ -14,10 +14,10 @@ accuracy = accuracy / length(RESULTS);
 correlation = correlation / length(RESULTS);  
 
 % plot 
+LW = 2; 
 subplot(121)
-plot(correlation)
+plot(correlation, 'linewidth', LW)
 ylabel('correlation')
-
 subplot(122)
-plot(accuracy)
+plot(accuracy, 'linewidth', LW)
 ylabel('accuracy')

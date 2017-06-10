@@ -11,6 +11,7 @@ y_test = y(testIdx);
 %% cvfit lasso with with CVGLMNET
 if strcmp(method, 'glmnet')
     options.nlambda = 100;
+%     options.maxit = 1e5;
     cvfit = cvglmnet(X_train,y_train, 'binomial',options,'class',CVB);
     
     y_hat = cvglmnetPredict(cvfit, X_test, 'lambda_min');
